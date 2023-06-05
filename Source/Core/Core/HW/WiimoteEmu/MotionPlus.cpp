@@ -530,20 +530,6 @@ void MotionPlus::Update(const DesiredExtensionState& target_state)
 
 MotionPlus::DataFormat::Data MotionPlus::GetGyroscopeData(const Common::Vec3& angular_velocity)
 {
-  // Conversion from radians to the calibrated values in degrees.
-  constexpr float VALUE_SCALE =
-      (CALIBRATION_SCALE_OFFSET >> (CALIBRATION_BITS - BITS_OF_PRECISION)) / float(MathUtil::TAU) *
-      360;
-
-  constexpr float SLOW_SCALE = VALUE_SCALE / CALIBRATION_SLOW_SCALE_DEGREES;
-  constexpr float FAST_SCALE = VALUE_SCALE / CALIBRATION_FAST_SCALE_DEGREES;
-
-  static_assert(ZERO_VALUE == 1 << (BITS_OF_PRECISION - 1),
-                "SLOW_MAX_RAD_PER_SEC assumes calibrated zero is at center of sensor values.");
-
-  constexpr u16 SENSOR_RANGE = 1 << (BITS_OF_PRECISION - 1);
-  constexpr float SLOW_MAX_RAD_PER_SEC = SENSOR_RANGE / SLOW_SCALE;
-
   // Slow (high precision) scaling can be used if it fits in the sensor range.
   const float yaw = angular_velocity.z;
   const bool yaw_slow = (std::abs(yaw) < SLOW_MAX_RAD_PER_SEC);

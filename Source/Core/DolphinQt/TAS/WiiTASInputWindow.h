@@ -78,6 +78,9 @@ private:
   QSpinBox* m_remote_orientation_x_value;
   QSpinBox* m_remote_orientation_y_value;
   QSpinBox* m_remote_orientation_z_value;
+  QSpinBox* m_remote_rotation_x_value;
+  QSpinBox* m_remote_rotation_y_value;
+  QSpinBox* m_remote_rotation_z_value;
   QSpinBox* m_nunchuk_orientation_x_value;
   QSpinBox* m_nunchuk_orientation_y_value;
   QSpinBox* m_nunchuk_orientation_z_value;
@@ -92,6 +95,7 @@ private:
   QSpinBox* m_left_trigger_value;
   QSpinBox* m_right_trigger_value;
   QGroupBox* m_remote_orientation_box;
+  QGroupBox* m_remote_rotation_box;
   QGroupBox* m_nunchuk_orientation_box;
   QGroupBox* m_ir_box;
   QGroupBox* m_nunchuk_stick_box;

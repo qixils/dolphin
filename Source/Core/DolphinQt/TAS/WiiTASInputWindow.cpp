@@ -22,6 +22,7 @@
 #include "Core/HW/WiimoteEmu/Extension/Classic.h"
 #include "Core/HW/WiimoteEmu/Extension/Extension.h"
 #include "Core/HW/WiimoteEmu/Extension/Nunchuk.h"
+#include "Core/HW/WiimoteEmu/MotionPlus.h"
 #include "Core/HW/WiimoteEmu/WiimoteEmu.h"
 #include "Core/HW/WiimoteReal/WiimoteReal.h"
 
@@ -102,7 +103,8 @@ WiiTASInputWindow::WiiTASInputWindow(QWidget* parent, int num) : TASInputWindow(
   m_ir_box->setMinimumWidth(20);
   m_nunchuk_stick_box->setMinimumWidth(20);
 
-  m_remote_orientation_box = new QGroupBox(tr("Wii Remote Orientation"));
+  m_remote_orientation_box = new QGroupBox(tr("Wii Remote Linear Acceleration"));
+  m_remote_rotation_box = new QGroupBox(tr("Wii Remote Angular Velocity"));
 
   auto* top_layout = new QHBoxLayout;
   top_layout->addWidget(m_ir_box);
@@ -143,6 +145,39 @@ WiiTASInputWindow::WiiTASInputWindow(QWidget* parent, int num) : TASInputWindow(
   remote_orientation_layout->addLayout(remote_orientation_y_layout);
   remote_orientation_layout->addLayout(remote_orientation_z_layout);
   m_remote_orientation_box->setLayout(remote_orientation_layout);
+
+  constexpr u16 GYRO_MIN = 0;
+  constexpr u16 GYRO_MAX = (1 << 16) - 1;
+  constexpr u16 GYRO_ZERO = (GYRO_MAX / 2) + 1;
+  constexpr double GYRO_SCALE = GYRO_ZERO / (WiimoteEmu::MotionPlus::ZERO_VALUE / WiimoteEmu::MotionPlus::FAST_SCALE);
+
+  auto* remote_rotation_x_layout =
+      // i18n: Refers to a 3D axis (used when mapping motion controls)
+      CreateSliderValuePairLayout(tr("X"), WiimoteEmu::Wiimote::GYROSCOPE_GROUP,
+                                  ControllerEmu::ReshapableInput::X_INPUT_OVERRIDE,
+                                  &m_wiimote_overrider, m_remote_rotation_x_value, GYRO_ZERO,
+                                  GYRO_ZERO, GYRO_MIN, GYRO_MAX, Qt::Key_Z,
+                                  m_remote_rotation_box, GYRO_SCALE);
+  auto* remote_rotation_y_layout =
+      // i18n: Refers to a 3D axis (used when mapping motion controls)
+      CreateSliderValuePairLayout(tr("Y"), WiimoteEmu::Wiimote::GYROSCOPE_GROUP,
+                                  ControllerEmu::ReshapableInput::Y_INPUT_OVERRIDE,
+                                  &m_wiimote_overrider, m_remote_rotation_y_value, GYRO_ZERO,
+                                  GYRO_ZERO, GYRO_MIN, GYRO_MAX, Qt::Key_X,
+                                  m_remote_rotation_box, GYRO_SCALE);
+  auto* remote_rotation_z_layout =
+      // i18n: Refers to a 3D axis (used when mapping motion controls)
+      CreateSliderValuePairLayout(tr("Z"), WiimoteEmu::Wiimote::GYROSCOPE_GROUP,
+                                  ControllerEmu::ReshapableInput::Z_INPUT_OVERRIDE,
+                                  &m_wiimote_overrider, m_remote_rotation_z_value, GYRO_ZERO,
+                                  GYRO_ZERO, GYRO_MIN, GYRO_MAX, Qt::Key_C,
+                                  m_remote_rotation_box, GYRO_SCALE);
+
+  auto* remote_rotation_layout = new QVBoxLayout;
+  remote_rotation_layout->addLayout(remote_rotation_x_layout);
+  remote_rotation_layout->addLayout(remote_rotation_y_layout);
+  remote_rotation_layout->addLayout(remote_rotation_z_layout);
+  m_remote_rotation_box->setLayout(remote_rotation_layout);
 
   m_nunchuk_orientation_box = new QGroupBox(tr("Nunchuk Orientation"));
 
